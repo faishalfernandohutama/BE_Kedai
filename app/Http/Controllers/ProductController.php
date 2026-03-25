@@ -44,5 +44,31 @@ class ProductController extends Controller
         ], 201);
     }
 
-    // ... (Fungsi show, update, dan destroy biarkan kosong dulu untuk sekarang)
+    public function update(Request $request, Product $product){
+        // validasi data yang masuk
+        $validated = $request->validate([
+            'name' => 'sometimes|required|string|max:255',
+            'category' => 'nullable|string',
+            'price' => 'sometimes|required|integer',
+            'stock' => 'sometimes|required|integer',
+            'description' => 'nullable|string',
+        ]);
+
+        // update data di databse
+        $product->update($validated);
+
+        return response()->json([
+            'message' => 'Data menu berhasil diperbarui',
+            'data' => $product
+        ], 200);
+    }
+
+    public function destroy(Product $product){
+        $product->delete();
+
+        return response()->json([
+            'message' => 'Menu berhasil dihapus dari daftar'
+        ], 200);
+    }
 }
+
