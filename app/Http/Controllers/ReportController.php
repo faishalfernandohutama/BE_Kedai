@@ -13,11 +13,11 @@ class ReportController extends Controller
         $today = Carbon::today();
 
         // hitung pendapatan hari ini (hanya dari pesanan yang sudha pain)
-        $todayRevenue = Order::whereDate('create_at', $today)
+        $todayRevenue = Order::whereDate('created_at', $today)
         ->where('status', 'paid')->sum('total_price');
 
         // hitung total transaksi hari ini (semua status)
-        $totalOrders = Order::whereDate('create_at', $today)
+        $totalOrders = Order::whereDate('created_at', $today)
         ->count();
 
         // peringatan stok menipis
