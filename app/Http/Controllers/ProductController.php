@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
@@ -31,8 +32,13 @@ class ProductController extends Controller
             'category' => 'nullable|string',
             'price' => 'required|integer',
             'stock' => 'required|integer',
-            'description' => 'nullable|string'
+            'description' => 'nullable|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048'
         ]);
+
+        if ($request->hasFile('image')){
+            $validated['image'] = $request->file('image')->store('products', 'public');
+        }
 
         // 2. Simpan ke database
         $product = Product::create($validated);
@@ -52,7 +58,18 @@ class ProductController extends Controller
             'price' => 'sometimes|required|integer',
             'stock' => 'sometimes|required|integer',
             'description' => 'nullable|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048'
         ]);
+
+        if ($request->hasFile('image')) {
+            // Hapus gambar lama dari folder storage (jika sebelumnya sudah punya gambar)
+            if ($product->image) {
+                Storage::disk('public')->delete($product->image);
+            }
+            
+            // Simpan gambar yang baru
+            $validated['image'] = $request->file('image')->store('products', 'public');
+        }
 
         // update data di databse
         $product->update($validated);
@@ -64,7 +81,10 @@ class ProductController extends Controller
     }
 
     public function destroy(Product $product){
-        $product->delete();
+    if ($product->image){
+        Storage::disk('public')->delete($product->image);
+    }
+    $product->delete();
 
         return response()->json([
             'message' => 'Menu berhasil dihapus dari daftar'
