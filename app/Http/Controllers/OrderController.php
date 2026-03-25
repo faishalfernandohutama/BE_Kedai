@@ -12,7 +12,12 @@ class OrderController extends Controller
      */
     public function index()
     {
-        //
+        $orders = \App\Models\Order::with('items')->latest()->get();
+
+        return response()->json([
+            'message' => 'berhasil mengambil riwayat transaksi',
+            'data' => $orders
+        ], 200);
     }
 
     /**
