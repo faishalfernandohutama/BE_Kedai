@@ -78,7 +78,18 @@ class OrderController extends Controller
      */
     public function update(Request $request, Order $order)
     {
-        //
+        $validated = $request->validate([
+            'status' => 'required|in:pending,paid,cancelled'
+        ]);
+
+        $order->update([
+            'status' => $validated['status']
+        ]);
+
+        return response()->json([
+            'message' => 'status pesanan berhasil diperbarui menjad ' . $validated['status'],
+            'data' => $order
+        ], 200);
     }
 
     /**
